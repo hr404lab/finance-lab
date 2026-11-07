@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {bond,stock,valuationDefaults as d} from '../dist/valuation.js';
+const near=(a,b,t=1e-8)=>assert.ok(Math.abs(a-b)<t,`${a} != ${b}`);
+test('assignment 4: zero coupon, half-year compounding',()=>near(bond({...d.bond,coupon:0,years:15,yield:6.85}).result,1000/1.03425**30));
+test('assignment 5: coupon price equals independently discounted cash flows',()=>near(bond(d.bond).result,Array.from({length:22},(_,i)=>44/1.056**(i+1)).reduce((a,b)=>a+b,0)+1000/1.056**22));
+test('bond yields 8/6/4% produce discount/par/premium, inverse round trip',()=>{for(const y of [8,6,4]){const s={...d.bond,coupon:6,years:2,yield:y},r=bond(s);near(bond({...s,bondSolve:'yield',price:r.result}).result,y);if(y===6)near(r.result,1000);else assert.equal(r.result<1000,y>6);}});
+test('assignment 8: g inverse distinguishes D0 from D1',()=>near(stock({...d.stock,model:'growth',d0:1.61,price:36.84,r:15.8}).result,(36.84*.158-1.61)/(36.84+1.61)*100));
+test('assignment 9: four years of 15%, then 2.5%',()=>{const v=stock(d.stock);near(v.result,[1,2,3,4].reduce((a,t)=>a+.2*1.15**t/1.174**t,0)+(.2*1.15**4*1.025/.149)/1.174**4);assert.equal(v.rows.length,4);near(v.next,.2*1.15**4*1.025);});
+test('assignment 10: current EPS excludes future growth',()=>near(stock({...d.stock,model:'multiple'}).result,26.416));
+test('LS8 Gordon, multistage, required return; LS7 perpetuity',()=>{near(stock({...d.stock,model:'gordon',d0:.5,g:2,r:15}).result,.51/.13);near(stock({...d.stock,model:'multi',d0:1,growths:'20,15,15',g:5,r:20}).result,1+1.38/1.2**2+(1.587+1.66635/.15)/1.2**3);near(stock({...d.stock,model:'required',d0:1,price:10.5,g:5}).result,15);near(stock({...d.stock,model:'perpetuity',d0:50,r:5}).result,1000);});
+test('guard invalid growth, empty stages and non-coupon dates',()=>{assert.throws(()=>stock({...d.stock,r:2,g:3}));assert.throws(()=>stock({...d.stock,growths:'15,'}));assert.throws(()=>bond({...d.bond,years:1.1}));});
