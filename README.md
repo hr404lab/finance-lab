@@ -1,46 +1,52 @@
 # Finance Lab
 
-MBA 재무관리 학습용 인터랙티브 계산기입니다. 입력값에 맞는 계산 결과, 현금흐름 그림, 핵심 해석과 BA II Plus 입력 순서를 제공합니다.
+Created by **HR404lab** · 한국어 MBA 재무관리 학습용 인터랙티브 계산기
 
-- TVM: 현재가치, 미래가치, 정기 지급액, 기간, 이율
-- 월복리 및 APR·EAR 환산
-- NPV와 반복 현금흐름
-- 채권 가격과 만기수익률
-- 영구연금, 일정·차등 배당성장, 성장률·요구수익률 역산, PER 평가
-- 학습 예제 23개와 모바일 화면 지원
+**[계산기 바로가기](https://finance-lab-cyan.vercel.app/)**
 
-## 실행
+## 기능
 
-별도의 패키지 설치 없이 정적 파일 서버로 실행합니다.
+- TVM: 현재가치·미래가치·정기 지급액·기간·수익률 역산
+- 월복리와 월 납입, APR·EAR 변환, 반복 현금흐름 NPV
+- 채권 가격·만기수익률(YTM), 영구채
+- 일정성장·차등성장 배당모형, 성장률·요구수익률 역산, PER 평가
+- 입력값에 맞춰 바뀌는 현금흐름 그림, BA II Plus 키 순서, 계산 해석
+- P/Y·C/Y·NOM·EFF 도움말, 학습 예제 23개, 모바일 화면
+
+모든 계산은 브라우저에서 처리하며, 입력값을 서버에 저장하지 않습니다. 금액 단위 선택은 환율 변환 기능이 아닙니다.
+
+## 로컬 실행
+
+Python 3와 Node.js를 설치한 환경에서 실행합니다. 별도 npm 패키지는 필요하지 않습니다.
 
 ```sh
-python3 -m http.server 8000 --directory dist
+npm start
 ```
 
-브라우저에서 `http://localhost:8000`을 엽니다.
+브라우저에서 http://localhost:3000 을 엽니다.
 
 ## 계산 검증
-
-Node.js가 설치된 환경에서 다음 명령을 실행합니다.
 
 ```sh
 npm test
 ```
 
-일시금, 연금, 월복리, 이율 환산, 기간·이율 역산, 채권 및 배당성장 모형 등을 검증하는 테스트 30개를 포함합니다.
+30개 검증에는 독립적으로 계산한 기준값, 기간 초·말 지급, 0% 이율, 서로 다른 납입·복리 빈도, 역산, 채권과 배당 가치평가가 포함됩니다.
+
+## 파일 구성
+
+- `dist/index.html`, `dist/style.css`: 화면과 디자인
+- `dist/app.js`: 입력·결과·키 가이드 연결
+- `dist/finance.js`: TVM·이율 변환·NPV 계산과 예제
+- `dist/valuation.js`: 채권·주식 가치평가와 예제
+- `dist/study-visuals.js`: 현금흐름 그림과 예제 설명
+- `tests/`: 계산 검증
+- `vercel.json`: 정적 배포 설정 (출력 폴더 `dist`)
+
+## 업데이트
+
+소스를 수정한 뒤 `npm test`와 브라우저 확인을 거쳐 GitHub에 커밋합니다. Vercel에 이 저장소를 연결하면 `main` 브랜치 변경을 자동 배포할 수 있습니다. 현재 운영 사이트는 파일 직접 배포 방식으로 등록되어 있으므로 GitHub 커밋만으로 자동 배포되지는 않습니다.
 
 ## 계산 기준
 
-금액 단위는 입력·표시 단위이며 환율을 변환하지 않습니다. 채권은 쿠폰 지급일, NPV는 동일 간격의 기간 말 현금흐름을 기준으로 합니다. 이율 역산은 지원 범위와 현금흐름 조건을 화면에 안내합니다. 수수료·세금·경과이자는 별도 반영하지 않습니다.
-
-모든 계산은 현재 브라우저에서 처리하며 입력값을 외부로 전송하지 않습니다. `dist/finance.js`와 `dist/valuation.js`에 계산 수식, `dist/study-visuals.js`에 학습 그림과 설명이 있습니다.
-
-## 공식 참고 자료
-
-- [BA II Plus 공식 가이드 안내](https://education.ti.com/en/guidebook/details/en/ADF11FB65B284B6195B0A7E9502784BA/baiiplus?id=6114)
-- [P/Y·C/Y 설정](https://education.ti.com/en/customer-support/knowledge-base/financial-calculators/general-information/11262)
-- [NPV 계산 안내](https://education.ti.com/en/customer-support/knowledge-base/financial-calculators/product-usage/11241)
-
-## Vercel 배포
-
-Vercel에서 이 GitHub 저장소를 가져오면 `vercel.json`의 설정으로 `dist` 폴더를 정적 사이트로 배포합니다. 별도 설치나 빌드 단계는 필요하지 않습니다.
+현금 지출은 음수, 수령은 양수입니다. 채권은 쿠폰 지급일 기준이며 경과이자는 제외합니다. 영구 배당성장모형은 요구수익률이 영구성장률보다 커야 합니다. 학습용 모형의 가정에 따른 계산 결과입니다.
